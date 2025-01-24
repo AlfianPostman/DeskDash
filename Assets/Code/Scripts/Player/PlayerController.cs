@@ -13,8 +13,12 @@ public class PlayerController : MonoBehaviour
     float moveSpeed = 0f;
 
     bool isFacingRight = true;
+    
+    // Hotkey
     bool walkButton;
     [HideInInspector] public bool attackButton;
+    [HideInInspector] public bool pickUpButton;
+
     bool ableToMove = true;
     [HideInInspector] public bool canAttack = true;
     Vector2 input;
@@ -62,11 +66,12 @@ public class PlayerController : MonoBehaviour
         {
             input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             input = Vector2.ClampMagnitude(input, 1);
+            walkButton = Input.GetKey(KeyCode.LeftShift);
+            attackButton = Input.GetKey(KeyCode.Mouse0);
+            pickUpButton = Input.GetKeyDown(KeyCode.E);
 
             // anim.SetFloat("speed", input.magnitude);
 
-            walkButton = Input.GetKey(KeyCode.LeftShift);
-            attackButton = Input.GetKey(KeyCode.E);
 
             if (walkButton) {
                 moveSpeed = baseSpeed;

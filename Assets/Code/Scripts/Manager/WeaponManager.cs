@@ -77,10 +77,11 @@ public class WeaponManager : MonoBehaviour
         float comboResetTime = weaponScript.attackDuration[currentComboIndex] / 2; // Time to reset the combo if no input is received
         bool comboActive = true; // To manage the combo state
 
-        pc.canAttack = false;
 
         while (comboActive)
         {
+            pc.canAttack = false;
+            
             // Change the hitbox damage based on combo index attack damage
             weaponScript.InitAttackDetail(weaponScript.attackDamage[currentComboIndex], pc.gameObject.name, "Attack"+(currentComboIndex+1), attackID);
 
@@ -94,6 +95,8 @@ public class WeaponManager : MonoBehaviour
             // Wait for the attack duration of the current step
             yield return new WaitForSeconds(comboResetTime + (comboResetTime/2));
 
+            pc.canAttack = true;
+            
             // Wait for the next input within the combo reset time
             float timer = 0f;
             float timeStopped = 0f;
@@ -131,6 +134,5 @@ public class WeaponManager : MonoBehaviour
         }
 
         pc.anim.SetBool("isAttacking", false);
-        pc.canAttack = true;
     }
 }

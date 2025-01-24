@@ -27,7 +27,7 @@ public class AttackHitbox : MonoBehaviour
     private void OnTriggerEnter(Collider col) {
         if (col.CompareTag("Enemy"))
         {
-            col.GetComponent<EnemyController>()?.TakeDamage(weaponDamage, damageSource, attackName, attackID);
+            col.GetComponent<NpcController>()?.TakeDamage(weaponDamage, damageSource, attackName, attackID);
         }
     }    
 }
