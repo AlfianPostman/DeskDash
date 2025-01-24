@@ -8,13 +8,20 @@ public class NpcController : MonoBehaviour
 {
     int lastAttackID = -1;
 
-    NavMeshAgent agent;
     HealthSystem hs;
-    bool isStunned = false;
-    bool isCaptured = false;
-
+    [HideInInspector] public Animator anim;
+    NavMeshAgent agent;
     SimpleFlash flash;
     Shake shake;
+    Rigidbody rb;
+    Collider col;
+
+    public MeshRenderer bubble;
+    private Transform playerTarget;
+    ColliderController colController;
+
+    bool isStunned = false;
+    bool isCaptured = false;
 
     [SerializeField] int healthPoint;
 
@@ -26,20 +33,18 @@ public class NpcController : MonoBehaviour
     [SerializeField] float range;
     [SerializeField] LayerMask groundLayer;
 
-    [HideInInspector] public Animator anim;
-
-    public MeshRenderer bubble;
-
-    private Transform playerTarget;
-
     void Start()
     {
         hs = new HealthSystem(healthPoint);
         anim = GetComponentInChildren<Animator>();
         agent = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
 
         flash = GetComponent<SimpleFlash>();
         shake = GameObject.FindGameObjectWithTag("ScreenShake").GetComponent<Shake>();
+
+        anim.SetBool("isMoving", true);
     }
 
     void Update()
@@ -57,9 +62,13 @@ public class NpcController : MonoBehaviour
             {
                 transform.position = playerTarget.position;
             }
+
+            anim.SetBool("isMoving", false);
         }
         else
         {
+            anim.SetBool("isMoving", true);
+
             if(agent.velocity.magnitude < 0.15f || !walkPointSet)
             {
                 SearchForDestination();
@@ -87,31 +96,46 @@ public class NpcController : MonoBehaviour
         if(Physics.Raycast(destinedPoint, Vector3.down, groundLayer)) walkPointSet = true;
     }
 
-    public void TakeDamage(float amount, string damageSource, string attackName, int attackID)
+    public void TakeDamage(float amount, string damageSource, string attackName, int attackID, Vector3 launchDirection)
     {
         if (lastAttackID != attackID)
         {
             flash.Flash();
             lastAttackID = attackID;
-            StartCoroutine(DamagedProcess(amount, damageSource, attackName));
+
+            DamagedProcess(amount, damageSource, attackName, launchDirection);
         }
     }
 
-    IEnumerator DamagedProcess(float amount, string damageSource, string attackName)
+    void DamagedProcess(float amount, string damageSource, string attackName, Vector3 launchDirection)
     {
         hs.Damage(amount);
         shake.CamShake();
         Debug.Log("This " + this.gameObject.name + " take " + amount + " damage. From " + damageSource + "'s " + attackName);
-        yield return new WaitForSeconds(.1f);
 
-        if(hs.health <= 0) StartCoroutine(DyingProcess());
+        if (isStunned)
+        {
+            rb.AddForce(launchDirection * 100f, ForceMode.Impulse);
+        }
+
+        if(hs.health <= 0 && !isStunned) StartCoroutine(DyingProcess());
     }
 
-    public void Captured(Transform target)
+    public void Captured(Transform PlayerScript, Transform target)
     {
-        isCaptured = true;
-        Debug.Log("Captured");
-        playerTarget = target;
+        colController = PlayerScript.GetComponent<ColliderController>();
+
+        if (isStunned)
+        {
+            isCaptured = true;
+            playerTarget = target;
+        }
+    }
+
+    public void Throw(Vector3 direction)
+    {
+        Debug.Log("aaa");
+        rb.AddForce(direction * 1000f, ForceMode.Impulse);
     }
 
     public IEnumerator DyingProcess() 
@@ -119,18 +143,23 @@ public class NpcController : MonoBehaviour
         text.text = "Stunned!";
         isStunned = true;
         bubble.enabled = true;
-       
+        col.enabled = false;
+        rb.useGravity = false;
+
         agent.ResetPath();
         destinedPoint = Vector3.zero;
 
         yield return new WaitForSecondsRealtime(10f);
-        
+
+        colController?.ObjectDropped();
+
         isCaptured = false;
         isStunned = false;
-
-        hs.Heal(healthPoint);
-        text.text = "";
-
         bubble.enabled = false;
+        col.enabled = true;
+        rb.useGravity = true;
+
+        // hs.Heal(healthPoint);
+        text.text = "";
     }
 }

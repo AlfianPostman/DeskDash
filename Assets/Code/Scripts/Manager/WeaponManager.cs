@@ -81,9 +81,11 @@ public class WeaponManager : MonoBehaviour
         while (comboActive)
         {
             pc.canAttack = false;
-            
+
+            Vector3 launchDirection = pc.transform.forward;
+
             // Change the hitbox damage based on combo index attack damage
-            weaponScript.InitAttackDetail(weaponScript.attackDamage[currentComboIndex], pc.gameObject.name, "Attack"+(currentComboIndex+1), attackID);
+            weaponScript.InitAttackDetail(weaponScript.attackDamage[currentComboIndex], pc.gameObject.name, "Attack"+(currentComboIndex+1), attackID, launchDirection);
 
             attackID++;
 
@@ -93,7 +95,7 @@ public class WeaponManager : MonoBehaviour
             pc.anim.SetBool("isAttacking", true);
 
             // Wait for the attack duration of the current step
-            yield return new WaitForSeconds(comboResetTime + (comboResetTime/2));
+            yield return new WaitForSeconds(comboResetTime);
 
             pc.canAttack = true;
             
@@ -121,7 +123,7 @@ public class WeaponManager : MonoBehaviour
                 currentComboIndex++;
 
                 // Loop back to the start of the combo if the index exceeds the combo length
-                if (currentComboIndex >= 2)
+                if (currentComboIndex >= 1)
                 {
                     currentComboIndex = 0;
                     yield return new WaitForSeconds(comboResetTime);

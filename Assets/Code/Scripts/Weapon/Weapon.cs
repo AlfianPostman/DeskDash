@@ -3,7 +3,7 @@ using UnityEngine;
 public class Weapon : WeaponManager
 {
     [Header("Weapon Detail")]
-    public float[] attackDuration = { 1.3f, 1.3f, 1.3f };
+    public float[] attackDuration = { 1f, 1f, 1f };
     public float comboResetTime = 1f;
     [HideInInspector] public float[] attackDamage;
 
@@ -38,7 +38,7 @@ public class Weapon : WeaponManager
         }
     }
 
-    public void InitAttackDetail(float amount, string damageSource, string attackName, int attackID)
+    public void InitAttackDetail(float amount, string damageSource, string attackName, int attackID, Vector3 launchDirection)
     {
         // Initialize the array for AttackHitbox references
         hitBoxes = new AttackHitbox[hitBoxTransforms.Length];
@@ -51,7 +51,7 @@ public class Weapon : WeaponManager
                 hitBoxes[i] = hitBoxTransforms[i].gameObject.GetComponent<AttackHitbox>();
                 if (hitBoxes[i] != null) // Ensure the AttackHitbox component exists
                 {
-                    hitBoxes[i].GetDamageDetail(amount, damageSource, attackName, attackID);
+                    hitBoxes[i].GetDamageDetail(amount, damageSource, attackName, attackID, launchDirection);
                 }
                 else
                 {

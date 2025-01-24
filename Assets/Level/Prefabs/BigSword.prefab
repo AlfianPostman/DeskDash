@@ -96,7 +96,15 @@ MonoBehaviour:
   weaponName: GreatSword
   weaponDamage: 100
   weaponContainer: {fileID: 0}
-  weapon: {fileID: 0}
+  weaponObj: {fileID: 0}
+  pc: {fileID: 0}
+  wpAnim: {fileID: 0}
+  attackDuration:
+  - 1
+  - 1
+  - 1
+  comboResetTime: 1
+  attackDamage: []
   hitBoxTransforms:
   - {fileID: 953471152978420849}
   - {fileID: 1684195388779038813}
@@ -167,8 +175,8 @@ Transform:
   m_GameObject: {fileID: 2240346622358573613}
   serializedVersion: 2
   m_LocalRotation: {x: -0.40743232, y: 0.0000001490116, z: 0.000000014901159, w: 0.91323537}
-  m_LocalPosition: {x: 3.3, y: 0.37, z: -6.47}
-  m_LocalScale: {x: 0.09230244, y: 1.0341606, z: 1.1076655}
+  m_LocalPosition: {x: 3.3, y: 0.39, z: -6.5}
+  m_LocalScale: {x: 0.09230244, y: 2.076388, z: 1.6083304}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6683183566086639383}
@@ -275,8 +283,8 @@ Transform:
   m_GameObject: {fileID: 2826966479633469289}
   serializedVersion: 2
   m_LocalRotation: {x: -0.121687494, y: 0, z: 0, w: 0.99256843}
-  m_LocalPosition: {x: 3.3, y: 2.26, z: -3.45}
-  m_LocalScale: {x: 0.11334076, y: 2.571739, z: 2.2438893}
+  m_LocalPosition: {x: 3.3, y: 1.22, z: -3.19}
+  m_LocalScale: {x: 0.11334076, y: 4.61543, z: 2.2438893}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6683183566086639383}
@@ -383,8 +391,8 @@ Transform:
   m_GameObject: {fileID: 3136057154244006995}
   serializedVersion: 2
   m_LocalRotation: {x: -0.2646902, y: 0.000000014901163, z: -0.0000000074505815, w: 0.96433353}
-  m_LocalPosition: {x: 3.3, y: 1.781, z: -5.012}
-  m_LocalScale: {x: 0.09230244, y: 1.9796042, z: 1.8273786}
+  m_LocalPosition: {x: 3.3, y: 0.87, z: -4.48}
+  m_LocalScale: {x: 0.09230244, y: 4.2868934, z: 1.8273786}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6683183566086639383}
@@ -491,8 +499,8 @@ Transform:
   m_GameObject: {fileID: 6984185436870765201}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.3, y: 2.4, z: -1.43}
-  m_LocalScale: {x: 0.07457199, y: 2.8362498, z: 2.4352527}
+  m_LocalPosition: {x: 3.3, y: 1.28, z: -1.43}
+  m_LocalScale: {x: 0.07457199, y: 5.021297, z: 2.4352527}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6683183566086639383}
@@ -599,8 +607,8 @@ Transform:
   m_GameObject: {fileID: 7106840993624485880}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5230844, y: 0.00000017881392, z: -0, w: 0.85228086}
-  m_LocalPosition: {x: 3.3000023, y: -1.0599976, z: -7.1300025}
-  m_LocalScale: {x: 0.09230244, y: 0.4923225, z: 0.6146658}
+  m_LocalPosition: {x: 3.3, y: -0.88, z: -7.49}
+  m_LocalScale: {x: 0.09230244, y: 1.2047623, z: 0.87276393}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6683183566086639383}

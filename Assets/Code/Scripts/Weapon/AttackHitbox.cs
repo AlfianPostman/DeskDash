@@ -16,18 +16,21 @@ public class AttackHitbox : MonoBehaviour
 
     int attackID;
 
-    public void GetDamageDetail(float value, string source, string name, int attackIdVal)
+    Vector3 launchDir;
+
+    public void GetDamageDetail(float value, string source, string name, int attackIdVal, Vector3 launchDirection)
     {
         weaponDamage = value;
         damageSource = source;
         attackName = name;
         attackID = attackIdVal;
+        launchDir = launchDirection;
     }
 
     private void OnTriggerEnter(Collider col) {
         if (col.CompareTag("Enemy"))
         {
-            col.GetComponent<NpcController>()?.TakeDamage(weaponDamage, damageSource, attackName, attackID);
+            col.GetComponent<NpcController>()?.TakeDamage(weaponDamage, damageSource, attackName, attackID, launchDir);
         }
     }    
 }

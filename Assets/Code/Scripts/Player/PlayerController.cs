@@ -9,13 +9,17 @@ public class PlayerController : MonoBehaviour
     public float baseSpeed = 3f;
     public float runSpeed = 5f;
     public float turnSmoothTime;
+    public float dashForce = 1000f;
+    public float dashCooldown = 2f;
     float turnSmoothVelocity;
     float moveSpeed = 0f;
+    bool canDash = true;
+    bool isDashing = false;
 
     bool isFacingRight = true;
     
     // Hotkey
-    bool walkButton;
+    bool dashButton;
     [HideInInspector] public bool attackButton;
     [HideInInspector] public bool pickUpButton;
 
@@ -66,20 +70,11 @@ public class PlayerController : MonoBehaviour
         {
             input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             input = Vector2.ClampMagnitude(input, 1);
-            walkButton = Input.GetKey(KeyCode.LeftShift);
+            dashButton = Input.GetKey(KeyCode.LeftShift);
             attackButton = Input.GetKey(KeyCode.Mouse0);
             pickUpButton = Input.GetKeyDown(KeyCode.E);
 
             // anim.SetFloat("speed", input.magnitude);
-
-
-            if (walkButton) {
-                moveSpeed = baseSpeed;
-                // anim.SetBool("isWalking", true); 
-            } else {
-                moveSpeed = runSpeed;
-                // anim.SetBool("isWalking", false); 
-            }
 
             if (attackButton && canAttack) {
                 wm.Attack();
@@ -96,7 +91,11 @@ public class PlayerController : MonoBehaviour
 
     void Movement() 
     {
+        moveSpeed = runSpeed;
         Vector3 direction = new Vector3(input.x, 0f, input.y).normalized;
+
+        Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
+        Debug.DrawRay(transform.position, forward, Color.green);
 
         // Normalize the camera angle
         Vector3 camForward = cam.forward;
@@ -134,12 +133,41 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isMoving", false);
         }
 
+        if (dashButton && canDash && !isDashing) 
+        {
+            StartCoroutine(Dash());
+        }
+
         // Start Moving
         if (ableToMove)
         {
             Vector3 yVelocity = new Vector3(0, rb.linearVelocity.y, 0);
             rb.linearVelocity = input.x * camRight * moveSpeed + input.y * camForward * moveSpeed + yVelocity;
         }
+    }
+
+    IEnumerator Dash()
+    {
+        canDash = false;
+        isDashing = true;
+
+        // Get the dash direction (forward or based on input)
+        Vector3 dashDirection = transform.forward;
+
+        // Apply the dash force
+        rb.AddForce(dashDirection * dashForce, ForceMode.Impulse);
+
+        // Wait for the dash duration
+        yield return new WaitForSeconds(.2f);
+
+        // Stop the dash (optional, depending on how you want to control the motion)
+        rb.linearVelocity = Vector3.zero;
+
+        isDashing = false;
+
+        // Wait for the cooldown
+        yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
     }
 
     public IEnumerator Dead() 

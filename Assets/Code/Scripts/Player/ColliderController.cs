@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ColliderController : MonoBehaviour
 {
@@ -7,28 +8,87 @@ public class ColliderController : MonoBehaviour
     PlayerController pc;
     WeaponManager wm;
     public Transform carryTarget;
+
+    bool isCarrying = false;
     
-    private void Start() {
+    public string pickupTag = "NPCInteract"; // Tag for objects that can be picked up
+    private List<GameObject> nearbyObjects = new List<GameObject>(); // List of nearby objects
+
+    private void Start() 
+    {
         pc = GetComponent<PlayerController>();
         wm = GetComponent<WeaponManager>();
     }
 
-    private void OnTriggerEnter(Collider col) {
+    private void OnTriggerEnter(Collider col) 
+    {
         if (col.CompareTag("Weapon"))
         {
             Transform _col = col.transform;
             wm.AttachWeapon(_col);
         }
-    }    
 
-    private void OnTriggerStay(Collider col) {
         if (col.CompareTag("NPCInteract"))
         {
-            if(pc.pickUpButton)
+            nearbyObjects.Add(col.gameObject);
+        }
+        
+        // if (col.CompareTag("NPCInteract"))
+        // {
+        //     if(pc.pickUpButton)
+        //     {
+        //         col.GetComponentInParent<NpcController>()?.Captured(carryTarget);
+        //     }
+        // }
+    }
+
+    private void OnTriggerExit(Collider col) 
+    {
+        if (col.CompareTag("NPCInteract"))
+        {
+            nearbyObjects.Remove(col.gameObject);
+        }
+    }
+
+    void Update()
+    {
+        if (pc.pickUpButton && !isCarrying)
+        {
+            PickupClosestObject();
+        }
+    }
+
+    void PickupClosestObject()
+    {
+        if (nearbyObjects.Count == 0) return;
+
+        GameObject closestObject = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (GameObject obj in nearbyObjects)
+        {
+            if (obj == null) continue; // Skip null references (in case an object is destroyed)
+
+            float distance = Vector3.Distance(transform.position, obj.transform.position);
+            if (distance < closestDistance)
             {
-                Debug.Log("am taking");
-                col.GetComponentInParent<NpcController>()?.Captured(carryTarget);
+                closestDistance = distance;
+                closestObject = obj;
             }
         }
-    }    
+
+        // Call the pickup function on the closest object
+        if (closestObject != null)
+        {
+            isCarrying = true;
+
+            closestObject.GetComponentInParent<NpcController>()?.Captured(this.transform, carryTarget);
+            nearbyObjects.Remove(closestObject);
+        }
+    }
+
+    public void ObjectDropped()
+    {
+        isCarrying = false;
+    }
 }
