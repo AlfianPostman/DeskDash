@@ -8,6 +8,7 @@ public class ColliderController : MonoBehaviour
     PlayerController pc;
     WeaponManager wm;
     public Transform carryTarget;
+    private Transform heldObject;
 
     bool isCarrying = false;
     
@@ -32,14 +33,27 @@ public class ColliderController : MonoBehaviour
         {
             nearbyObjects.Add(col.gameObject);
         }
+
+    }
+
+    private void OnTriggerStay(Collider col) 
+    {
         
-        // if (col.CompareTag("NPCInteract"))
-        // {
-        //     if(pc.pickUpButton)
-        //     {
-        //         col.GetComponentInParent<NpcController>()?.Captured(carryTarget);
-        //     }
-        // }
+        if (col.CompareTag("Bucket"))
+        {
+            if (pc.pickUpButton && isCarrying)
+            {
+                Debug.Log(heldObject);
+                Transform _pos = col.GetComponentInParent<Bucket>().containerTarget;
+                
+                heldObject.GetComponentInParent<NpcController>()?.SuccessfullyCaptured(_pos);
+            }
+        }
+    }
+
+    void StoreObjectInBucket()
+    {
+
     }
 
     private void OnTriggerExit(Collider col) 
@@ -55,6 +69,11 @@ public class ColliderController : MonoBehaviour
         if (pc.pickUpButton && !isCarrying)
         {
             PickupClosestObject();
+        }
+
+        if (pc.throwButton && heldObject != null)
+        {
+            heldObject.GetComponentInParent<NpcController>()?.Throw(pc.transform.forward);
         }
     }
 
@@ -81,6 +100,7 @@ public class ColliderController : MonoBehaviour
         if (closestObject != null)
         {
             isCarrying = true;
+            heldObject = closestObject.transform.parent;
 
             closestObject.GetComponentInParent<NpcController>()?.Captured(this.transform, carryTarget);
             nearbyObjects.Remove(closestObject);
@@ -90,5 +110,6 @@ public class ColliderController : MonoBehaviour
     public void ObjectDropped()
     {
         isCarrying = false;
+        heldObject = null;
     }
 }

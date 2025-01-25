@@ -16,10 +16,16 @@ public class NpcController : MonoBehaviour
     Rigidbody rb;
     Collider col;
 
+    // Hitbox Region
+    public Transform hurtBox;
+    Collider colHurtBox;
+    MeshRenderer meshHurtBox;
+
     public MeshRenderer bubble;
-    private Transform playerTarget;
+    Transform playerTarget;
     ColliderController colController;
 
+    bool ded = false;
     bool isStunned = false;
     bool isCaptured = false;
 
@@ -44,12 +50,16 @@ public class NpcController : MonoBehaviour
         flash = GetComponent<SimpleFlash>();
         shake = GameObject.FindGameObjectWithTag("ScreenShake").GetComponent<Shake>();
 
+        colHurtBox = hurtBox.GetComponent<Collider>();
+        meshHurtBox = hurtBox.GetComponent<MeshRenderer>();
+
         anim.SetBool("isMoving", true);
     }
 
     void Update()
     {
-        Behaviour();
+        if(!ded)
+            Behaviour();
     }
 
     void Behaviour()
@@ -96,6 +106,12 @@ public class NpcController : MonoBehaviour
         if(Physics.Raycast(destinedPoint, Vector3.down, groundLayer)) walkPointSet = true;
     }
 
+    public void StopPathFind()
+    {
+        agent.isStopped = true;
+        anim.SetBool("isMoving", true);
+    }
+
     public void TakeDamage(float amount, string damageSource, string attackName, int attackID, Vector3 launchDirection)
     {
         if (lastAttackID != attackID)
@@ -115,7 +131,7 @@ public class NpcController : MonoBehaviour
 
         if (isStunned)
         {
-            rb.AddForce(launchDirection * 100f, ForceMode.Impulse);
+            rb.AddForce(launchDirection * 80f, ForceMode.Impulse);
         }
 
         if(hs.health <= 0 && !isStunned) StartCoroutine(DyingProcess());
@@ -129,13 +145,39 @@ public class NpcController : MonoBehaviour
         {
             isCaptured = true;
             playerTarget = target;
+            col.enabled = false;
         }
+    }
+
+    public void SuccessfullyCaptured(Transform target)
+    {
+        StartCoroutine(CapturedProcess(target));
+    }
+
+    IEnumerator CapturedProcess(Transform target)
+    {
+        rb.linearVelocity = Vector3.zero;
+
+        ded = true;
+        agent.enabled = false;
+        transform.position = target.position;
+        colController?.ObjectDropped();
+        rb.useGravity = false;
+        col.enabled = true;
+
+        yield return new WaitForSeconds(2f);
+
+        rb.useGravity = true;
     }
 
     public void Throw(Vector3 direction)
     {
         Debug.Log("aaa");
-        rb.AddForce(direction * 1000f, ForceMode.Impulse);
+        isCaptured = false;
+
+        rb.AddForce(direction * 10f, ForceMode.Impulse);
+
+        colController?.ObjectDropped();
     }
 
     public IEnumerator DyingProcess() 
@@ -143,13 +185,16 @@ public class NpcController : MonoBehaviour
         text.text = "Stunned!";
         isStunned = true;
         bubble.enabled = true;
-        col.enabled = false;
-        rb.useGravity = false;
+        // rb.useGravity = false;
 
-        agent.ResetPath();
+        agent?.ResetPath();
         destinedPoint = Vector3.zero;
 
         yield return new WaitForSecondsRealtime(10f);
+
+        colHurtBox.enabled = true;
+        yield return new WaitForSecondsRealtime(0.1f);
+        colHurtBox.enabled = false;
 
         colController?.ObjectDropped();
 
@@ -157,7 +202,7 @@ public class NpcController : MonoBehaviour
         isStunned = false;
         bubble.enabled = false;
         col.enabled = true;
-        rb.useGravity = true;
+        // rb.useGravity = true;
 
         // hs.Heal(healthPoint);
         text.text = "";

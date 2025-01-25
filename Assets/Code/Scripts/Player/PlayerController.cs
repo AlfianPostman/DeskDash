@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Character Movement Setting")]
+    [Header("Character Setting")]
     [Space(10)]
     public float baseSpeed = 3f;
     public float runSpeed = 5f;
@@ -20,10 +20,11 @@ public class PlayerController : MonoBehaviour
     
     // Hotkey
     bool dashButton;
+    [HideInInspector] public bool throwButton;
     [HideInInspector] public bool attackButton;
     [HideInInspector] public bool pickUpButton;
 
-    bool ableToMove = true;
+    [HideInInspector] public bool ableToMove = true;
     [HideInInspector] public bool canAttack = true;
     Vector2 input;
 
@@ -45,12 +46,12 @@ public class PlayerController : MonoBehaviour
     // Manager Reference
     PlayerSpriteController ps;
     WeaponManager wm;
-    
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
         anim = GetComponentInChildren<Animator>();
+
+        rb = GetComponent<Rigidbody>();
         ps = GetComponent<PlayerSpriteController>();
         ct = GetComponent<CameraTarget>();
         wm = GetComponent<WeaponManager>();
@@ -72,7 +73,8 @@ public class PlayerController : MonoBehaviour
             input = Vector2.ClampMagnitude(input, 1);
             dashButton = Input.GetKey(KeyCode.LeftShift);
             attackButton = Input.GetKey(KeyCode.Mouse0);
-            pickUpButton = Input.GetKeyDown(KeyCode.E);
+            pickUpButton = Input.GetKey(KeyCode.E);
+            throwButton = Input.GetKey(KeyCode.Q);
 
             // anim.SetFloat("speed", input.magnitude);
 
@@ -168,11 +170,5 @@ public class PlayerController : MonoBehaviour
         // Wait for the cooldown
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
-    }
-
-    public IEnumerator Dead() 
-    {
-        ableToMove = false;
-        yield return new WaitForSeconds(1f);
     }
 }

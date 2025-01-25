@@ -8,6 +8,7 @@ TagManager:
   - Weapon
   - ScreenShake
   - NPCInteract
+  - Bucket
   layers:
   - Default
   - TransparentFX

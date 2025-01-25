@@ -1,26 +1,25 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class EnemyController : MonoBehaviour
+public class PlayerHealth : MonoBehaviour 
 {
-    int lastAttackID = -1;
-
-    HealthSystem hs;
     SimpleFlash flash;
     Shake shake;
+    PlayerController pc;
+    HealthSystem hs;
+    
+    public int healthPoint = 100;
 
-    [SerializeField]
-    float iFrameTime;
-    [SerializeField]
-    int healthPoint;
+    int lastAttackID;
 
-    void Start() 
+    private void Start() 
     {
         hs = new HealthSystem(healthPoint);
+        pc = GetComponent<PlayerController>();
+
         flash = GetComponent<SimpleFlash>();
         shake = GameObject.FindGameObjectWithTag("ScreenShake").GetComponent<Shake>();
-
-        // Debug.Log("hp: " + hs.maxHealth + " or " + hs.GetHealthPercentage()*100 + "%");
     }
 
     public void TakeDamage(float amount, string damageSource, string attackName, int attackID)
@@ -40,13 +39,12 @@ public class EnemyController : MonoBehaviour
         Debug.Log("This " + this.gameObject.name + " take " + amount + " damage. From " + damageSource + "'s " + attackName);
         yield return new WaitForSeconds(.1f);
 
-        if(hs.health <= 0) StartCoroutine(DyingProcess());
+        if(hs.health <= 0) StartCoroutine(Dead());
     }
-    
-    IEnumerator DyingProcess()
+
+    public IEnumerator Dead() 
     {
-        Debug.Log("Eouoeueggh mati aku wak ..");
+        pc.ableToMove = false;
         yield return new WaitForSeconds(1f);
-        Destroy(this.gameObject);
     }
 }
