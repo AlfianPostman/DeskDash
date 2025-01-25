@@ -1,13 +1,16 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerSpriteController : MonoBehaviour
 {
     public Transform pSprite;
-    public Transform cam;
     public Transform spriteTarget;
+    GameObject cam;
     SpriteRenderer sp;
 
-    private void Start() {
+    private void Start() 
+    {
+        cam = GameObject.FindWithTag("Camera");
         sp = pSprite.GetComponent<SpriteRenderer>();
     }
     

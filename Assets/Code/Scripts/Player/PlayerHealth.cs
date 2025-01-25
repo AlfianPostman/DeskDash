@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,10 +9,10 @@ public class PlayerHealth : MonoBehaviour
     Shake shake;
     PlayerController pc;
     HealthSystem hs;
-    
-    public int healthPoint = 100;
+    public Slider slider;
+    public GameHandler gh;
 
-    int lastAttackID;
+    public int healthPoint = 100;
 
     private void Start() 
     {
@@ -22,22 +23,23 @@ public class PlayerHealth : MonoBehaviour
         shake = GameObject.FindGameObjectWithTag("ScreenShake").GetComponent<Shake>();
     }
 
-    public void TakeDamage(float amount, string damageSource, string attackName, int attackID)
+    private void Update() 
     {
-        if (lastAttackID != attackID)
-        {
-            flash.Flash();
-            lastAttackID = attackID;
-            StartCoroutine(DamagedProcess(amount, damageSource, attackName));
-        }
+        slider.value = hs.health;
     }
 
-    IEnumerator DamagedProcess(float amount, string damageSource, string attackName)
+    public void TakeDamage(float amount, string damageSource)
+    {
+        flash.Flash();
+        StartCoroutine(DamagedProcess(amount, damageSource));
+    }
+
+    IEnumerator DamagedProcess(float amount, string damageSource)
     {
         hs.Damage(amount);
         shake.CamShake();
-        Debug.Log("This " + this.gameObject.name + " take " + amount + " damage. From " + damageSource + "'s " + attackName);
-        yield return new WaitForSeconds(.1f);
+        Debug.Log("This " + this.gameObject.name + " take " + amount + " damage. From " + damageSource);
+        yield return new WaitForSeconds(.2f);
 
         if(hs.health <= 0) StartCoroutine(Dead());
     }
@@ -46,5 +48,8 @@ public class PlayerHealth : MonoBehaviour
     {
         pc.ableToMove = false;
         yield return new WaitForSeconds(1f);
+        Debug.Log("am dedddd");
+
+        gh.Losing();
     }
 }

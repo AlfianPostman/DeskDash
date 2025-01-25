@@ -2,4 +2,9 @@ using UnityEngine;
 
 public class Bucket : MonoBehaviour {
     public Transform containerTarget;
+
+    void Score()
+    {
+        
+    }
 }

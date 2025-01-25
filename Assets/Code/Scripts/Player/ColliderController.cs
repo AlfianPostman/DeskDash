@@ -33,7 +33,11 @@ public class ColliderController : MonoBehaviour
         {
             nearbyObjects.Add(col.gameObject);
         }
-
+        
+        if (col.CompareTag("PlanB"))
+        {
+            transform.position = pc.originalPosition.position;
+        }
     }
 
     private void OnTriggerStay(Collider col) 
@@ -46,7 +50,7 @@ public class ColliderController : MonoBehaviour
                 Debug.Log(heldObject);
                 Transform _pos = col.GetComponentInParent<Bucket>().containerTarget;
                 
-                heldObject.GetComponentInParent<NpcController>()?.SuccessfullyCaptured(_pos);
+                this.heldObject.GetComponentInParent<NpcController>()?.SuccessfullyCaptured(_pos);
             }
         }
     }
@@ -100,10 +104,11 @@ public class ColliderController : MonoBehaviour
         if (closestObject != null)
         {
             isCarrying = true;
-            heldObject = closestObject.transform.parent;
 
             closestObject.GetComponentInParent<NpcController>()?.Captured(this.transform, carryTarget);
             nearbyObjects.Remove(closestObject);
+            
+            heldObject = closestObject.transform.parent;
         }
     }
 

@@ -9,6 +9,8 @@ TagManager:
   - ScreenShake
   - NPCInteract
   - Bucket
+  - Camera
+  - PlanB
   layers:
   - Default
   - TransparentFX

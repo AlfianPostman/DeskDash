@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,11 +21,12 @@ public class PlayerController : MonoBehaviour
     
     // Hotkey
     bool dashButton;
+    bool restartButton;
     [HideInInspector] public bool throwButton;
     [HideInInspector] public bool attackButton;
     [HideInInspector] public bool pickUpButton;
 
-    [HideInInspector] public bool ableToMove = true;
+    [HideInInspector] public bool ableToMove = false;
     [HideInInspector] public bool canAttack = true;
     Vector2 input;
 
@@ -46,6 +48,13 @@ public class PlayerController : MonoBehaviour
     // Manager Reference
     PlayerSpriteController ps;
     WeaponManager wm;
+    public GameHandler gh;
+
+    public Animator hand;
+    public Transform handTarget;
+    public Transform originalPosition;
+    public bool startSceneTriggered = false;
+    public bool startScene = true;
 
     void Start()
     {
@@ -55,12 +64,27 @@ public class PlayerController : MonoBehaviour
         ps = GetComponent<PlayerSpriteController>();
         ct = GetComponent<CameraTarget>();
         wm = GetComponent<WeaponManager>();
+
+        rb.useGravity = false;
     }
 
     void FixedUpdate()
     {
         MyInputs();
-        Movement();
+
+        if(startSceneTriggered)
+        {
+            StartCoroutine(StartSceneProccess());
+        }
+
+        if(!startScene)
+        {
+            Movement();
+        }
+        else
+        {
+        transform.position = handTarget.position;
+        }
     }
 
     void MyInputs() 
@@ -75,6 +99,9 @@ public class PlayerController : MonoBehaviour
             attackButton = Input.GetKey(KeyCode.Mouse0);
             pickUpButton = Input.GetKey(KeyCode.E);
             throwButton = Input.GetKey(KeyCode.Q);
+            restartButton = Input.GetKey(KeyCode.Escape);
+
+            if(restartButton) SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
             // anim.SetFloat("speed", input.magnitude);
 
@@ -170,5 +197,22 @@ public class PlayerController : MonoBehaviour
         // Wait for the cooldown
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    public void StartGame()
+    {
+        startSceneTriggered = true;
+    }
+
+    IEnumerator StartSceneProccess()
+    {
+        hand.SetTrigger("Start");
+
+        yield return new WaitForSeconds(3f);
+
+        gh.isTimerRunning = true;
+        rb.useGravity = true;
+        startScene = false;
+        startSceneTriggered = false;
     }
 }
